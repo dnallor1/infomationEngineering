@@ -42,13 +42,15 @@ int main() {
 
     int rect_velocity_x = 150;
     int rect_velocity_y = 450;
+    int rect_ang_velocity = 10;
 
     int circ_velocity_x = 50;
     int circ_velocity_y = 150;
+    int circ_ang_velocity = 5;
 
     int conv_velocity_x = 100;
     int conv_velocity_y = 300;
-    int ang_velocity = 10;
+    int conv_ang_velocity = 15;
 
     bool flag_y = false;
     bool flag_x = false;
@@ -58,13 +60,13 @@ int main() {
         float dt = elapsed.asSeconds();
 
         rectangle.move(rect_velocity_x*dt,rect_velocity_y*dt);
-        rectangle.rotate(ang_velocity*dt);
+        rectangle.rotate(rect_ang_velocity*dt);
 
         circle1.move(circ_velocity_x*dt,circ_velocity_y*dt);
-        circle1.rotate(ang_velocity*dt);
+        circle1.rotate(circ_ang_velocity*dt);
 
         triangle.move(conv_velocity_x*dt,conv_velocity_y*dt);
-        triangle.rotate(ang_velocity*dt);
+        triangle.rotate(conv_ang_velocity*dt);
 
         sf::FloatRect rectangle_bounds = rectangle.getGlobalBounds();
         std::cout << rectangle_bounds.top << " " << rectangle_bounds.left << " " ;
