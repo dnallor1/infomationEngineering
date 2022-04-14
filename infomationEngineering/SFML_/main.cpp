@@ -13,7 +13,6 @@ int main() {
     circle1.setPosition(600.0, 400.0);
     circle1.setFillColor(sf::Color(100, 250, 50));
 
-
     sf::RectangleShape rectangle(sf::Vector2f(120.0, 60.0));
     rectangle.setPosition(500.0, 400.0);
     rectangle.setFillColor(sf::Color(100, 50, 250));
@@ -21,7 +20,6 @@ int main() {
     sf::RectangleShape rectangle1(sf::Vector2f(90.0, 45.0));
     rectangle1.setPosition(600.0, 100.0);
     rectangle1.setFillColor(sf::Color::Yellow);
-
 
     sf::ConvexShape triangle;
     triangle.setPointCount(3);
@@ -31,6 +29,7 @@ int main() {
     triangle.setOutlineColor(sf::Color::Red);
     triangle.setOutlineThickness(2);
     triangle.setPosition(300.0, 300.0);
+    sf::Clock clock;
 
     sf::ConvexShape triangle1;
     triangle1.setPointCount(3);
@@ -41,8 +40,6 @@ int main() {
     triangle1.setOutlineThickness(2);
     triangle1.setPosition(100.0, 450.0);
 
-
-    sf::Clock clock;
     int rect_velocity_x = 150;
     int rect_velocity_y = 450;
     int rect_ang_velocity = 10;
@@ -53,10 +50,16 @@ int main() {
 
     int conv_velocity_x = 100;
     int conv_velocity_y = 300;
-    int conv_ang_velocity = 15;
+    int conv_ang_velocity = 20;
 
     bool flag_y = false;
     bool flag_x = false;
+
+    bool flag_y2 = false;
+    bool flag_x2 = false;
+
+    bool flag_y3 = false;
+    bool flag_x3 = false;
 
     while (window.isOpen()) {
         sf::Time elapsed = clock.restart();
@@ -75,7 +78,7 @@ int main() {
         std::cout << rectangle_bounds.top << " " << rectangle_bounds.left << " " ;
         std::cout << rectangle_bounds.width << " " << rectangle_bounds.height << std::endl;
 
-        if(rectangle_bounds.top <= 0 || rectangle_bounds.top + rectangle_bounds.height >= window.getSize().y)
+        if(rectangle_bounds.top<=0 || rectangle_bounds.top+rectangle_bounds.height>=window.getSize().y)
         {
             if(flag_y != true)
             {
@@ -89,7 +92,7 @@ int main() {
         else
             flag_y = false;
 
-        if(rectangle_bounds.left <= 0 || rectangle_bounds.left + rectangle_bounds.width >= window.getSize().x)
+        if(rectangle_bounds.left<=0 || rectangle_bounds.left+rectangle_bounds.width>=window.getSize().x)
         {
             if(flag_x!=true)
             {
@@ -107,65 +110,65 @@ int main() {
         std::cout << circle1_bounds.top << " " << circle1_bounds.left << " " ;
         std::cout << circle1_bounds.width << " " << circle1_bounds.height << std::endl;
 
-        if(circle1_bounds.top <= 0 ||circle1_bounds.top + circle1_bounds.height >= window.getSize().y)
+        if(circle1_bounds.top<=0 ||circle1_bounds.top+circle1_bounds.height>=window.getSize().y)
         {
-            if(flag_y != true)
+            if(flag_y2 != true)
             {
                 circ_velocity_y *= -1;
                 circle1.setFillColor(sf::Color(rand() % 256,
                                                rand() % 256,
                                                rand() % 256));
             }
-            flag_y = true;
+            flag_y2 = true;
         }
         else
-            flag_y = false;
+            flag_y2 = false;
 
-        if(circle1_bounds.left <= 0 || circle1_bounds.left + circle1_bounds.width >= window.getSize().x)
+        if(circle1_bounds.left<=0 || circle1_bounds.left+circle1_bounds.width>=window.getSize().x)
         {
-            if(flag_x!=true)
+            if(flag_x2!=true)
             {
                 circ_velocity_x *= -1;
                 circle1.setFillColor(sf::Color(rand() % 256,
                                                rand() % 256,
                                                rand() % 256));
             }
-            flag_x = true;
+            flag_x2 = true;
         }
         else
-            flag_x = false;
+            flag_x2 = false;
 
         sf::FloatRect triangle_bounds = triangle.getGlobalBounds();
         std::cout << triangle_bounds.top << " " << triangle_bounds.left << " " ;
         std::cout << triangle_bounds.width << " " << triangle_bounds.height << std::endl;
 
-        if(triangle_bounds.top <= 0 || triangle_bounds.top + triangle_bounds.height >= window.getSize().y)
+        if(triangle_bounds.top<=0 || triangle_bounds.top+triangle_bounds.height>=window.getSize().y)
         {
-            if(flag_y != true)
+            if(flag_y3 != true)
             {
                 conv_velocity_y *= -1;
                 triangle.setFillColor(sf::Color(rand() % 256,
                                                 rand() % 256,
                                                 rand() % 256));
             }
-            flag_y = true;
+            flag_y3 = true;
         }
         else
-            flag_y = false;
+            flag_y3 = false;
 
-        if(triangle_bounds.left <= 0 || triangle_bounds.left + triangle_bounds.width >= window.getSize().x)
+        if(triangle_bounds.left<=0 || triangle_bounds.left+triangle_bounds.width>=window.getSize().x)
         {
-            if(flag_x!=true)
+            if(flag_x3!=true)
             {
                 conv_velocity_x *= -1;
                 triangle.setFillColor(sf::Color(rand() % 256,
                                                 rand() % 256,
                                                 rand() % 256));
             }
-            flag_x = true;
+            flag_x3 = true;
         }
         else
-            flag_x = false;
+            flag_x3 = false;
 
 
         sf::Event event;
@@ -186,5 +189,6 @@ int main() {
 
         window.display();
     }
+
     return 0;
 }
