@@ -5,8 +5,7 @@
 const static auto DEFAULT_COLOR = sf::Color(100, 250, 50);
 class CustomRectangleShape : public sf::RectangleShape {
 public:
-    CustomRectangleShape(const sf::Vector2f &size, const sf::Vector2f &position) : sf::RectangleShape(size)
-    {
+    CustomRectangleShape(const sf::Vector2f &size, const sf::Vector2f &position) : sf::RectangleShape(size) {
         setPosition(position);
         setFillColor(DEFAULT_COLOR);
     }
@@ -16,11 +15,10 @@ public:
         m_speed_ro = ro_s;
     }
 
-    void animate(const sf::Time &elapsed){
+    void animate(const sf::Time &elapsed) {
         float dt = elapsed.asSeconds();
         move(m_speed_x * dt, m_speed_y * dt);
         rotate(m_speed_ro * dt);
-        bounce();
     }
     void setBounds(const float& left, const float& right, const float& up,const float& down){
         bound_left  = left  ;
@@ -28,33 +26,33 @@ public:
         bound_up  = up  ;
         bound_down  = down  ;
     }
-    void change_color(sf::RectangleShape &rectangle)
-    {
-        rectangle.setFillColor(sf::Color(rand() % 255, rand() % 255, rand() % 255));
-    }
-    void moveInDirection(float elapsed, const sf::Keyboard::Key &key) {
+    void moveInDirection(float dt, const sf::Keyboard::Key &key) {
         if (not is_currently_selected_) {
             return;
         }
-        sf::FloatRect bounding_box = getGlobalBounds();
-        if (key == sf::Keyboard::Up and bounding_box.top > 0) {
-            move(0, -m_speed_y * elapsed);
+        sf::FloatRect bounds = getGlobalBounds();
+        if (key == sf::Keyboard::Up and bounds.top > 0) {
+            move(0, -m_speed_y * dt);
         } else if (key == sf::Keyboard::Down and
-                   bounding_box.top + bounding_box.height < window_size.y) {
-            move(0, m_speed_y * elapsed);
-        } else if (key == sf::Keyboard::Left and bounding_box.left > 0) {
-            move(-m_speed_x * elapsed, 0);
+                   bounds.top + bounds.height > window_size.y) {
+            move(0, m_speed_y * dt);
+        } else if (key == sf::Keyboard::Left and bounds.left > 0) {
+            move(-m_speed_x * dt, 0);
         } else if (key == sf::Keyboard::Right and
-                   bounding_box.left + bounding_box.width < window_size.x) {
-            move(m_speed_x * elapsed, 0);
+                   bounds.left + bounds.width > window_size.x) {
+            move(m_speed_x * dt, 0);
         }
     }
-    bool isClicked(const sf::Vector2i &mouse_position)
-    {
+    void moveInDirection2(float dt, sf::Vector2i mouse_pos) {
+        if (not is_currently_selected_) {
+            return;
+        }
+        move(mouse_pos.x * dt, mouse_pos.y * dt);
+    }
+    bool isClicked(const sf::Vector2i &mouse_position) {
         sf::FloatRect bounds = getGlobalBounds();
         if(mouse_position.x >= bounds.left && mouse_position.x <= bounds.left + bounds.width
-                && mouse_position.y >= bounds.top && mouse_position.y <= bounds.top + bounds.height)
-        {
+                && mouse_position.y >= bounds.top && mouse_position.y <= bounds.top + bounds.height) {
             return true;
         }
         return false;
@@ -77,82 +75,62 @@ private:
     float bound_down = 0;
     bool is_currently_selected_ = false;
     sf::Vector2u window_size;
-    void bounce(){
-        sf::FloatRect rectangle_bounds = getGlobalBounds();
-
-        if(rectangle_bounds.top <= bound_up){
-            m_speed_y = abs(m_speed_y);
-        }
-        if(rectangle_bounds.top + rectangle_bounds.height >= bound_down){
-            m_speed_y = abs(m_speed_y) * -1;
-            setFillColor(sf::Color(rand() % 256, rand() % 256, rand() % 256));
-        }
-        if(rectangle_bounds.left <= bound_left ){
-            m_speed_x = abs(m_speed_x);
-            setFillColor(sf::Color(rand() % 256, rand() % 256, rand() % 256));
-        }
-        if(rectangle_bounds.left + rectangle_bounds.width >= bound_right){
-            m_speed_x = abs(m_speed_x) * -1;
-            setFillColor(sf::Color(rand() % 256, rand() % 256, rand() % 256));
-        }
-    }
 };
 int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600), "My window");
     std::srand(std::time(nullptr));
     std::vector<CustomRectangleShape> rectangles;
-    for(int i=0; i<10; i++)
-    {
+    for(int i=0; i<10; i++) {
         sf::Vector2f size(120.0, 60.0);
         sf::Vector2f position(std::rand() % (window.getSize().x - 120), std::rand() % (window.getSize().y - 60));
         rectangles.emplace_back(CustomRectangleShape(size, position));
     }
-    for(auto &rec : rectangles)
-    {
+    for(auto &rec : rectangles) {
         rec.setFillColor(sf::Color(0, 255, 0));
         rec.setBounds(0, window.getSize().x, 0, window.getSize().y);
-        rec.setSpeed(100, 200, 10);
+        rec.setSpeed(3000, 3000, 1500);
     }
     sf::Clock clock;
+    bool clicked = false;
     while (window.isOpen()) {
         sf::Time elapsed = clock.restart();
         float dt = elapsed.asSeconds();
-
         sf::Event event;
         while (window.pollEvent(event)) {
-            if(event.type == sf::Event::Closed)
-            {
+            if(event.type == sf::Event::Closed) {
                 window.close();
             }
-
-            if(event.type == sf::Event::KeyReleased)
-            {
-                //                if(event.key.code == sf::Keyboard::Space)
+            if(event.type == sf::Event::KeyPressed) {
+                //                                if(event.key.code == sf::Keyboard::Space)
                 for (auto &rec : rectangles) {
                     rec.moveInDirection(dt, event.key.code);
                 }
             }
-            if(event.type == sf::Event::MouseButtonPressed)
-            {
-//                     if(event.mouseButton.button == sf::Mouse::Left)
-
-                     sf::Vector2i mouse_pos = sf::Mouse::getPosition(window);
+            if(event.type == sf::Event::MouseButtonPressed) {
+                //                     if(event.mouseButton.button == sf::Mouse::Left)
+                sf::Vector2i mouse_pos = sf::Mouse::getPosition(window);
                 for (auto &rec : rectangles) {
-                    if (rec.isClicked(mouse_pos))
-                    {
+                    if (rec.isClicked(mouse_pos)) {
                         rec.select();
                     }
-                    else
-                    {
+                    else {
                         rec.deselect();
                     }
+                }
+                clicked = true;
+            }
+            if(event.type == sf::Event::MouseButtonReleased) {
+                clicked = false;
+            }
+            if(clicked && event.type == sf::Event::MouseMoved) {
+                sf::Vector2i mouse_pos = sf::Mouse::getPosition(window);
+                for (auto &rec : rectangles) {
+                    rec.moveInDirection2(dt, mouse_pos);
                 }
             }
         }
         window.clear(sf::Color::Black);
-
-        for(auto &rec : rectangles)
-        {
+        for(auto &rec : rectangles) {
             window.draw(rec);
         }
         window.display();
