@@ -14,56 +14,57 @@ public:
         m_speed_y = y_s;
         m_speed_ro = ro_s;
     }
-
-    void animate(const sf::Time &elapsed) {
-        float dt = elapsed.asSeconds();
-        move(m_speed_x * dt, m_speed_y * dt);
-        rotate(m_speed_ro * dt);
-    }
     void setBounds(const float& left, const float& right, const float& up,const float& down){
-        bound_left  = left  ;
-        bound_right  = right  ;
-        bound_up  = up  ;
-        bound_down  = down  ;
+        bound_left  = left;
+        bound_right  = right;
+        bound_up  = up;
+        bound_down  = down;
     }
     void moveInDirection(float dt, const sf::Keyboard::Key &key) {
-        if (not is_currently_selected_) {
+        if (not currently_selected_) {
             return;
         }
         sf::FloatRect bounds = getGlobalBounds();
         if (key == sf::Keyboard::Up and bounds.top > 0) {
+            bouncce();
             move(0, -m_speed_y * dt);
         } else if (key == sf::Keyboard::Down and
                    bounds.top + bounds.height > window_size.y) {
+            bouncce();
             move(0, m_speed_y * dt);
         } else if (key == sf::Keyboard::Left and bounds.left > 0) {
+            bouncce();
             move(-m_speed_x * dt, 0);
         } else if (key == sf::Keyboard::Right and
                    bounds.left + bounds.width > window_size.x) {
+            bouncce();
             move(m_speed_x * dt, 0);
         }
     }
     void moveInDirection2(float dt, sf::Vector2i mouse_pos) {
-        if (not is_currently_selected_) {
+        if (not currently_selected_) {
             return;
         }
+        bouncce();
         move(mouse_pos.x * dt, mouse_pos.y * dt);
     }
     bool isClicked(const sf::Vector2i &mouse_position) {
         sf::FloatRect bounds = getGlobalBounds();
-        if(mouse_position.x >= bounds.left && mouse_position.x <= bounds.left + bounds.width
-                && mouse_position.y >= bounds.top && mouse_position.y <= bounds.top + bounds.height) {
+        if(mouse_position.x >= bounds.left &&
+           mouse_position.x <= bounds.left + bounds.width &&
+           mouse_position.y >= bounds.top &&
+           mouse_position.y <= bounds.top + bounds.height) {
             return true;
         }
         return false;
     }
     void select() {
         setFillColor(sf::Color(255, 0, 0));
-        is_currently_selected_ = true;
+        currently_selected_ = true;
     }
     void deselect() {
         setFillColor(DEFAULT_COLOR);
-        is_currently_selected_ = false;
+        currently_selected_ = false;
     }
 private:
     int m_speed_x = 0 ;
@@ -73,8 +74,24 @@ private:
     float bound_right = 0;
     float bound_up = 0;
     float bound_down = 0;
-    bool is_currently_selected_ = false;
+    bool currently_selected_ = false;
     sf::Vector2u window_size;
+
+    void bouncce(){
+        sf::FloatRect rectangle_bounds = getGlobalBounds();
+        if(rectangle_bounds.top <= bound_up){
+            m_speed_y = abs(m_speed_y);
+        }
+        if(rectangle_bounds.top + rectangle_bounds.height >= bound_down){
+            m_speed_y = abs(m_speed_y) * -1;
+        }
+        if(rectangle_bounds.left <= bound_left ){
+           m_speed_x = abs(m_speed_x);
+        }
+        if(rectangle_bounds.left + rectangle_bounds.width >= bound_right){
+            m_speed_x = abs(m_speed_x) * -1;
+        }
+    }
 };
 int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600), "My window");
@@ -100,16 +117,11 @@ int main() {
             if(event.type == sf::Event::Closed) {
                 window.close();
             }
-            if(event.type == sf::Event::KeyPressed) {
-                //                                if(event.key.code == sf::Keyboard::Space)
-                for (auto &rec : rectangles) {
-                    rec.moveInDirection(dt, event.key.code);
-                }
-            }
             if(event.type == sf::Event::MouseButtonPressed) {
                 //                     if(event.mouseButton.button == sf::Mouse::Left)
                 sf::Vector2i mouse_pos = sf::Mouse::getPosition(window);
                 for (auto &rec : rectangles) {
+
                     if (rec.isClicked(mouse_pos)) {
                         rec.select();
                     }
@@ -121,6 +133,12 @@ int main() {
             }
             if(event.type == sf::Event::MouseButtonReleased) {
                 clicked = false;
+            }
+            if(event.type == sf::Event::KeyPressed) {
+                //                                if(event.key.code == sf::Keyboard::Space)
+                for (auto &rec : rectangles) {
+                    rec.moveInDirection(dt, event.key.code);
+                }
             }
             if(clicked && event.type == sf::Event::MouseMoved) {
                 sf::Vector2i mouse_pos = sf::Mouse::getPosition(window);
